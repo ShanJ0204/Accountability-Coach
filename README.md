@@ -160,8 +160,16 @@ api/
     handlers.py       # inbound message routing
 schema.sql            # database schema
 scripts/smoke.py      # vision smoke test
+index.html            # marketing/landing page (served at / by Vercel)
 vercel.json           # function config + cron schedule
 ```
+
+### Landing page
+
+`index.html` is a self-contained marketing page explaining the coach, with
+recommended pricing tiers and a monetization plan. Vercel serves it at `/`
+alongside the `/api/*` functions. Update the "Open WhatsApp" button to your
+`https://wa.me/<number>?text=join%20<sandbox-code>` link before going live.
 
 ---
 

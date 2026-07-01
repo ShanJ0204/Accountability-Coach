@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Accountability Coach — your health coach on WhatsApp</title>
+<meta name="description" content="A WhatsApp coach that tracks calories from food photos, logs meals from text, and sends daily encouragement and fitness tips." />
+<style>
+  :root {
+    --ink: #12211a;
+    --ink-soft: #40564c;
+    --paper: #f6f4ee;
+    --card: #ffffff;
+    --leaf: #1f8a54;
+    --leaf-dark: #15633c;
+    --leaf-soft: #e3f2e9;
+    --amber: #e8973a;
+    --line: #e4e0d6;
+    --shadow: 0 1px 2px rgba(18,33,26,.06), 0 8px 24px rgba(18,33,26,.06);
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "Segoe UI", Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--ink);
+    background: var(--paper);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 { line-height: 1.2; letter-spacing: -0.02em; }
+  a { color: var(--leaf-dark); }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  .eyebrow {
+    display: inline-block; font-size: 13px; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--leaf-dark); background: var(--leaf-soft);
+    padding: 6px 12px; border-radius: 999px; margin-bottom: 18px;
+  }
+
+  /* Nav */
+  nav {
+    position: sticky; top: 0; z-index: 20; backdrop-filter: blur(8px);
+    background: rgba(246,244,238,.82); border-bottom: 1px solid var(--line);
+  }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; }
+  .brand .dot { width: 26px; height: 26px; border-radius: 8px; background: var(--leaf); display: grid; place-items: center; color: #fff; font-size: 15px; }
+  .nav-links { display: flex; gap: 26px; align-items: center; font-weight: 600; font-size: 15px; }
+  .nav-links a { color: var(--ink-soft); text-decoration: none; }
+  .nav-links a:hover { color: var(--ink); }
+  .btn {
+    display: inline-block; background: var(--leaf); color: #fff; font-weight: 700;
+    padding: 11px 20px; border-radius: 999px; text-decoration: none; border: none; cursor: pointer;
+    transition: transform .12s ease, background .12s ease; font-size: 15px;
+  }
+  .btn:hover { background: var(--leaf-dark); transform: translateY(-1px); }
+  .btn.ghost { background: transparent; color: var(--leaf-dark); border: 1.5px solid var(--leaf); }
+  .btn.ghost:hover { background: var(--leaf-soft); }
+  @media (max-width: 720px) { .nav-links a:not(.btn) { display: none; } }
+
+  /* Hero */
+  header { padding: 72px 0 40px; }
+  .hero { display: grid; grid-template-columns: 1.1fr .9fr; gap: 48px; align-items: center; }
+  .hero h1 { font-size: clamp(34px, 5vw, 54px); }
+  .hero p.lede { font-size: 20px; color: var(--ink-soft); margin: 20px 0 28px; max-width: 32ch; }
+  .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; }
+  .trust { margin-top: 22px; font-size: 14px; color: var(--ink-soft); }
+  @media (max-width: 860px) { .hero { grid-template-columns: 1fr; } }
+
+  /* Phone mockup */
+  .phone {
+    background: #0b3b26; border-radius: 34px; padding: 14px; box-shadow: var(--shadow);
+    max-width: 320px; margin: 0 auto; border: 6px solid #072a1b;
+  }
+  .phone-head { color: #cdeede; font-size: 13px; text-align: center; padding: 6px 0 12px; font-weight: 600; }
+  .chat { background: #e7ded2; border-radius: 20px; padding: 14px; display: flex; flex-direction: column; gap: 10px; min-height: 380px; }
+  .bubble { padding: 9px 13px; border-radius: 14px; font-size: 14px; max-width: 85%; box-shadow: 0 1px 1px rgba(0,0,0,.06); }
+  .bubble.me { background: #d4f5c8; align-self: flex-end; border-bottom-right-radius: 4px; }
+  .bubble.bot { background: #fff; align-self: flex-start; border-bottom-left-radius: 4px; }
+  .bubble .photo { display: block; background: linear-gradient(135deg,#f2b45c,#e8973a); border-radius: 9px; height: 84px; margin-bottom: 6px; position: relative; }
+  .bubble .photo::after { content: "🥗 meal photo"; position: absolute; inset: 0; display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 13px; }
+  .bubble small { color: var(--ink-soft); }
+
+  /* Sections */
+  section { padding: 64px 0; }
+  section.alt { background: var(--card); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .section-head { max-width: 640px; margin-bottom: 40px; }
+  .section-head h2 { font-size: clamp(26px, 3.6vw, 38px); }
+  .section-head p { color: var(--ink-soft); font-size: 18px; margin-top: 12px; }
+
+  /* Feature grid */
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 26px; box-shadow: var(--shadow);
+  }
+  section.alt .card { background: var(--paper); }
+  .card .ico { width: 44px; height: 44px; border-radius: 12px; background: var(--leaf-soft); color: var(--leaf-dark); display: grid; place-items: center; font-size: 22px; margin-bottom: 16px; }
+  .card h3 { font-size: 19px; margin-bottom: 8px; }
+  .card p { color: var(--ink-soft); font-size: 15.5px; }
+
+  /* Steps */
+  .steps { counter-reset: step; display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+  @media (max-width: 860px) { .steps { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 520px) { .steps { grid-template-columns: 1fr; } }
+  .step { position: relative; padding-top: 12px; }
+  .step::before {
+    counter-increment: step; content: counter(step);
+    display: grid; place-items: center; width: 38px; height: 38px; border-radius: 999px;
+    background: var(--leaf); color: #fff; font-weight: 800; margin-bottom: 12px;
+  }
+  .step h3 { font-size: 17px; margin-bottom: 6px; }
+  .step p { color: var(--ink-soft); font-size: 15px; }
+
+  /* Pricing */
+  .tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; align-items: start; }
+  @media (max-width: 860px) { .tiers { grid-template-columns: 1fr; } }
+  .tier { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 30px 26px; box-shadow: var(--shadow); }
+  .tier.featured { border: 2px solid var(--leaf); position: relative; }
+  .tier.featured .tag { position: absolute; top: -13px; left: 26px; background: var(--amber); color: #fff; font-size: 12px; font-weight: 800; letter-spacing: .04em; padding: 4px 12px; border-radius: 999px; text-transform: uppercase; }
+  .tier h3 { font-size: 20px; }
+  .price { font-size: 40px; font-weight: 800; margin: 12px 0 2px; }
+  .price span { font-size: 16px; font-weight: 600; color: var(--ink-soft); }
+  .tier .note { color: var(--ink-soft); font-size: 14px; margin-bottom: 18px; }
+  .tier ul { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  .tier li { font-size: 15px; padding-left: 26px; position: relative; }
+  .tier li::before { content: "✓"; position: absolute; left: 0; color: var(--leaf); font-weight: 800; }
+  .tier li.off { color: var(--ink-soft); }
+  .tier li.off::before { content: "—"; color: var(--line); }
+  .tier .btn { width: 100%; text-align: center; }
+
+  /* Monetize */
+  .money { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; }
+  @media (max-width: 860px) { .money { grid-template-columns: 1fr; } }
+  .money .card h3 { display: flex; align-items: center; gap: 10px; }
+  .money .card h3 .n { background: var(--leaf-soft); color: var(--leaf-dark); width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; font-size: 15px; }
+  .money ul { margin: 10px 0 0 2px; padding-left: 18px; color: var(--ink-soft); font-size: 15px; }
+  .money ul li { margin-bottom: 6px; }
+
+  /* Economics callout */
+  .callout { background: var(--leaf-dark); color: #eafaf1; border-radius: var(--radius); padding: 34px; }
+  .callout h2 { color: #fff; }
+  .callout .econ { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; margin-top: 22px; }
+  @media (max-width: 720px) { .callout .econ { grid-template-columns: 1fr; } }
+  .callout .econ div { background: rgba(255,255,255,.08); border-radius: 12px; padding: 18px; }
+  .callout .econ strong { display: block; font-size: 28px; color: #fff; }
+  .callout .econ small { color: #b9ddc7; }
+  .callout p.fine { margin-top: 18px; font-size: 13.5px; color: #b9ddc7; }
+
+  /* Disclaimer + footer */
+  .disclaimer { background: #fff7ea; border: 1px solid #f0d9b5; border-radius: 12px; padding: 16px 20px; font-size: 14px; color: #8a5a1a; }
+  footer { padding: 40px 0 60px; color: var(--ink-soft); font-size: 14px; text-align: center; border-top: 1px solid var(--line); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="brand"><span class="dot">🌿</span> Accountability&nbsp;Coach</div>
+    <div class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#start" class="btn">Start free</a>
+    </div>
+  </div>
+</nav>
+
+<header>
+  <div class="wrap hero">
+    <div>
+      <span class="eyebrow">On WhatsApp · no app to install</span>
+      <h1>Your health coach, right in your chats.</h1>
+      <p class="lede">Snap a photo of your meal and get instant calorie &amp; macro estimates. Log food by text. Get daily encouragement and fitness tips — all inside WhatsApp.</p>
+      <div class="hero-cta">
+        <a href="#start" class="btn">Start free on WhatsApp</a>
+        <a href="#pricing" class="btn ghost">See pricing</a>
+      </div>
+      <p class="trust">No downloads · Cancel anytime · Powered by Claude vision AI</p>
+    </div>
+    <div class="phone" aria-hidden="true">
+      <div class="phone-head">Accountability Coach · online</div>
+      <div class="chat">
+        <div class="bubble me"><span class="photo"></span>lunch 🍽️</div>
+        <div class="bubble bot"><strong>Logged: Grilled chicken salad</strong> — ~420 kcal (medium confidence)<br>P 38g · C 12g · F 24g<br>Today: 1,070/2,000 kcal (930 left).<br><small>estimate — adjust anytime</small></div>
+        <div class="bubble me">total</div>
+        <div class="bubble bot">Today so far (3 entries):<br>~1,070 kcal · P 61g · C 88g · F 41g</div>
+        <div class="bubble bot">Morning! 🌅 You're trending under goal — nice. Try a 10-min walk after lunch to lock in the momentum.</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="how">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">How it works</span>
+      <h2>From meal to logged in seconds.</h2>
+      <p>No forms, no barcode scanning, no separate app. Just message your coach the way you'd text a friend.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><h3>Say hi on WhatsApp</h3><p>Message the coach's number to opt in. Your phone number is your account — nothing to set up.</p></div>
+      <div class="step"><h3>Send a food photo</h3><p>Claude vision identifies the meal and estimates calories, protein, carbs, and fat.</p></div>
+      <div class="step"><h3>Or just describe it</h3><p>"Two eggs and toast with butter" gets logged the same way. Ask questions anytime.</p></div>
+      <div class="step"><h3>Stay on track</h3><p>See running daily totals vs. your goal and get a personalized daily check-in.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="features" class="alt">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Features</span>
+      <h2>Everything a pocket coach should do.</h2>
+    </div>
+    <div class="grid">
+      <div class="card"><div class="ico">📸</div><h3>Photo calorie tracking</h3><p>AI vision estimates calories and macros from a picture of your plate — no manual entry.</p></div>
+      <div class="card"><div class="ico">✍️</div><h3>Text logging</h3><p>Describe a meal in plain language and it's classified, estimated, and logged automatically.</p></div>
+      <div class="card"><div class="ico">🎯</div><h3>Daily goals &amp; totals</h3><p>Set a calorie goal, then get a running tally with every log. Say "total" for an instant summary.</p></div>
+      <div class="card"><div class="ico">💬</div><h3>Real coaching</h3><p>Ask about nutrition, workouts, habits, or motivation and get warm, practical answers.</p></div>
+      <div class="card"><div class="ico">🔔</div><h3>Daily check-ins</h3><p>A scheduled nudge with encouragement and a fitness tip, personalized to your recent intake.</p></div>
+      <div class="card"><div class="ico">🔒</div><h3>Private &amp; simple</h3><p>Lives in a chat you already use. Text "stop" to pause check-ins, "start" to resume — anytime.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="pricing">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Pricing</span>
+      <h2>Start free. Upgrade when it's part of your routine.</h2>
+      <p>Prices below are recommended launch tiers. Annual plans save ~2 months.</p>
+    </div>
+    <div class="tiers">
+      <div class="tier">
+        <h3>Free</h3>
+        <div class="price">$0</div>
+        <p class="note">Get the habit going.</p>
+        <ul>
+          <li>3 photo logs / day</li>
+          <li>Unlimited text logging</li>
+          <li>1 daily check-in</li>
+          <li>Daily totals vs. goal</li>
+          <li class="off">Weekly progress reports</li>
+          <li class="off">Personalized meal &amp; workout plans</li>
+        </ul>
+        <a href="#start" class="btn ghost">Start free</a>
+      </div>
+      <div class="tier featured">
+        <span class="tag">Most popular</span>
+        <h3>Pro</h3>
+        <div class="price">$9.99<span> / mo</span></div>
+        <p class="note">$79/yr — for consistent trackers.</p>
+        <ul>
+          <li>Unlimited photo logging</li>
+          <li>Unlimited coaching chat</li>
+          <li>Custom calorie &amp; macro goals</li>
+          <li>Weekly progress reports</li>
+          <li>Smart reminders when you go quiet</li>
+          <li class="off">1:1 human coach add-on</li>
+        </ul>
+        <a href="#start" class="btn">Start 7-day trial</a>
+      </div>
+      <div class="tier">
+        <h3>Coach+</h3>
+        <div class="price">$29<span> / mo</span></div>
+        <p class="note">$249/yr — guided results.</p>
+        <ul>
+          <li>Everything in Pro</li>
+          <li>Personalized meal &amp; workout plans</li>
+          <li>Adaptive weekly goal adjustments</li>
+          <li>Priority response speed</li>
+          <li>Monthly human coach check-in</li>
+          <li>Export your data anytime</li>
+        </ul>
+        <a href="#start" class="btn ghost">Talk to us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <div class="callout">
+      <span class="eyebrow" style="background:rgba(255,255,255,.14);color:#eafaf1">The unit economics</span>
+      <h2>Why these prices work.</h2>
+      <p style="color:#cdeede;max-width:60ch;margin-top:10px">Each interaction has a real cost — an AI vision/coaching call plus a WhatsApp message fee. Pricing is set so an active subscriber's monthly cost stays a small fraction of their plan.</p>
+      <div class="econ">
+        <div><strong>~$0.02</strong><small>est. AI cost per food-photo analysis (Claude Opus 4.8, structured output)</small></div>
+        <div><strong>~$2–5</strong><small>est. blended AI + messaging cost / active user / month</small></div>
+        <div><strong>60–80%</strong><small>target gross margin on the Pro tier at typical usage</small></div>
+      </div>
+      <p class="fine">Estimates for planning only. Switch the model to Claude Sonnet 5 (a one-line config change) to cut per-call cost ~40% if margins tighten at scale. Actual costs depend on image size, usage frequency, and your WhatsApp/Twilio rate.</p>
+    </div>
+  </div>
+</section>
+
+<section id="monetize">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Go-to-market</span>
+      <h2>Steps to monetize.</h2>
+      <p>A practical sequence from first users to durable revenue.</p>
+    </div>
+    <div class="money">
+      <div class="card">
+        <h3><span class="n">1</span> Launch free, meter the value</h3>
+        <ul>
+          <li>Ship the free tier to remove friction — the habit is the hook.</li>
+          <li>Cap the expensive action (photo logs/day) to protect margins.</li>
+          <li>Instrument logs/day, retention, and photo-vs-text usage from day one.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3><span class="n">2</span> Convert with a trial</h3>
+        <ul>
+          <li>Offer a 7-day Pro trial triggered after a user hits the free photo cap.</li>
+          <li>Add a paywall message in-chat: "You've logged 3 today — go unlimited for $9.99/mo."</li>
+          <li>Bill via Stripe Payment Links or WhatsApp Pay; store plan on the user row.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3><span class="n">3</span> Raise ARPU with tiers &amp; annual</h3>
+        <ul>
+          <li>Push annual plans (save ~2 months) to lift LTV and smooth cash flow.</li>
+          <li>Coach+ adds plans + a human touch — higher price, higher retention.</li>
+          <li>Add-ons: extra family members, a 1:1 human coach seat.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3><span class="n">4</span> Grow beyond direct subscriptions</h3>
+        <ul>
+          <li><strong>B2B / white-label:</strong> license to gyms, trainers, and clinics per seat.</li>
+          <li><strong>Referrals:</strong> give a free month for each friend who subscribes.</li>
+          <li><strong>Affiliates:</strong> recommend meal kits / supplements with disclosed partner links.</li>
+          <li><strong>Corporate wellness:</strong> per-employee plans sold to HR teams.</li>
+        </ul>
+      </div>
+    </div>
+    <div style="margin-top:26px" class="disclaimer">
+      <strong>Health disclaimer:</strong> Calorie and macro figures are AI estimates for casual self-tracking, not medical advice. For dietary or medical decisions, consult a qualified professional.
+    </div>
+  </div>
+</section>
+
+<section id="start" class="alt">
+  <div class="wrap" style="text-align:center;max-width:640px">
+    <span class="eyebrow">Get started</span>
+    <h2 style="font-size:clamp(26px,3.6vw,38px)">Coach yourself healthy — one message at a time.</h2>
+    <p style="color:var(--ink-soft);font-size:18px;margin:14px 0 26px">Message the coach on WhatsApp and send your first meal photo. It's free to start.</p>
+    <a href="#" class="btn" style="font-size:17px;padding:14px 28px">Open WhatsApp &amp; say hi</a>
+    <p class="trust" style="margin-top:16px">Replace this button with your Twilio WhatsApp link, e.g. <code>https://wa.me/&lt;number&gt;?text=join%20&lt;sandbox-code&gt;</code></p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    Accountability Coach · a WhatsApp health &amp; accountability bot.<br>
+    Estimates are not medical advice. © <span id="yr"></span>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+</body>
+</html>
