@@ -111,10 +111,12 @@ WhatsApp sandbox's **"When a message comes in"** webhook to
 - send **`goal 1800`** → expect a confirmation
 - ask **"any tips for staying motivated?"** → expect a coaching reply
 
-Test the nudge endpoint:
+Test the nudge endpoint. It's a **separate** ASGI app (a separate Vercel
+function), so run it on its own port before curling it:
 
 ```bash
-curl -H "Authorization: Bearer $CRON_SECRET" http://localhost:8000/api/nudge
+uvicorn api.nudge:app --port 8001
+curl -H "Authorization: Bearer $CRON_SECRET" http://localhost:8001/api/nudge
 ```
 
 ### 5. Deploy to Vercel

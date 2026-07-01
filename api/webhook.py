@@ -11,12 +11,19 @@ TwiML so Twilio renders the reply back to the user.
 from __future__ import annotations
 
 import logging
+import os
+import sys
 
-from fastapi import FastAPI, Request, Response
-from fastapi.responses import PlainTextResponse
+# Make the sibling ``_lib`` package importable no matter how this module is
+# loaded — as ``api.webhook`` (local ``uvicorn api.webhook:app``) or when bundled
+# by Vercel's Python builder, which runs the function from the ``api`` directory.
+sys.path.insert(0, os.path.dirname(__file__))
 
-from _lib import twilio_client
-from _lib.handlers import handle_message
+from fastapi import FastAPI, Request, Response  # noqa: E402
+from fastapi.responses import PlainTextResponse  # noqa: E402
+
+from _lib import twilio_client  # noqa: E402
+from _lib.handlers import handle_message  # noqa: E402
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("webhook")

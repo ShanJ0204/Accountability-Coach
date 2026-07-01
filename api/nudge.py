@@ -12,13 +12,20 @@ sends it over WhatsApp via the Twilio REST API.
 from __future__ import annotations
 
 import logging
+import os
+import sys
 from datetime import datetime, timedelta, timezone
 
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+# Make the sibling ``_lib`` package importable no matter how this module is
+# loaded — as ``api.nudge`` (local ``uvicorn api.nudge:app``) or when bundled by
+# Vercel's Python builder, which runs the function from the ``api`` directory.
+sys.path.insert(0, os.path.dirname(__file__))
 
-from _lib import coach, db, twilio_client
-from _lib.config import settings
+from fastapi import FastAPI, Request  # noqa: E402
+from fastapi.responses import JSONResponse  # noqa: E402
+
+from _lib import coach, db, twilio_client  # noqa: E402
+from _lib.config import settings  # noqa: E402
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("nudge")
