@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "api/webhook.py": { "maxDuration": 30 },
+    "api/nudge.py": { "maxDuration": 60 }
+  },
+  "crons": [
+    { "path": "/api/nudge", "schedule": "0 13 * * *" }
+  ]
+}
